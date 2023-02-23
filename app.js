@@ -22,6 +22,16 @@ const PORT = 3000;
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
+
+/*
+ * ensureAuthenticated Callback Function
+*/
+const ensureAuthenticated = (req, res, next) => {
+  if(req.isAuthenticated()){return next()};
+  res.redirect('/login');
+
+}
+
 /*
  * Passport Configurations
 */
@@ -38,6 +48,7 @@ passport.serializeUser(function(user, done){
 passport.deserializeUser(function(user, done){
   done(null, user);
 });
+
 
 
 
@@ -73,7 +84,7 @@ app.get('/', (req, res) => {
   res.render('index', { user: req.user });
 })
 
-app.get('/account', (req, res) => {
+app.get('/account', ensureAuthenticated, (req, res) => {
   res.render('account', { user: req.user });
 });
 
@@ -85,6 +96,11 @@ app.get('/logout', (req, res) => {
   req.logout();
   res.redirect('/');
 });
+app.get('auth/github', passport.authenticate('github', { scope: []}));
+app.get('auth/github/callback', passport.authenticate('github', {
+  failureRedirect: '/login',
+  sucessRedirect: '/'
+}))
 
 
 
@@ -95,7 +111,4 @@ app.get('/logout', (req, res) => {
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
-/*
- * ensureAuthenticated Callback Function
-*/
 
