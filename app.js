@@ -40,7 +40,7 @@ passport.use(new GitHubStrategy({
   clientSecret: GITHUB_CLIENT_SECRET,
   callbackURL: "http://localhost:3000/auth/github/callback"
 }, function(accessToken, refreshToken, profile, done){
-  return done(null, profile);
+  done(null, profile);
 }));
 passport.serializeUser(function(user, done){
   done(null, user);
@@ -66,7 +66,7 @@ app.use(partials());
 app.use(express.json());
 app.use(express.static(__dirname + '/public'));
 app.use(session({
-  secret: 'ccodecademy',
+  secret: 'codecademy',
   resave: false,
   saveUninitialized: false
 }));
@@ -96,8 +96,8 @@ app.get('/logout', (req, res) => {
   req.logout();
   res.redirect('/');
 });
-app.get('auth/github', passport.authenticate('github', { scope: []}));
-app.get('auth/github/callback', passport.authenticate('github', {
+app.get('/auth/github', passport.authenticate('github', { scope: ["user"]}));
+app.get('/auth/github/callback', passport.authenticate('github', {
   failureRedirect: '/login',
   sucessRedirect: '/'
 }))
